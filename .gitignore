@@ -1,0 +1,7 @@
+*.key
+*.pem
+*.csr.cnf
+*.v3.ext
+*.csr
+*.srl
+*.txt

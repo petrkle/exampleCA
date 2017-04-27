@@ -1,2 +1,0 @@
-V	290322192928Z		1000	unknown	/C=CZ/ST=Czech Republic/L=Lhota/O=Somebody/CN=*.example.com
-V	290322193110Z		1001	unknown	/C=CZ/ST=Czech Republic/L=Lhota/O=Somebody/CN=*.example.cz

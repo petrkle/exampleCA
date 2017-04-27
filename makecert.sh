@@ -1,14 +1,32 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 FQDN=$1
 
 [ -z $FQDN ] && echo "usage: $0 fqdn" && exit 1
 
-# vygenerovani zadosti o certifikat
-echo "openssl req -config openssl.cnf -new -keyout private/${FQDN}-key.pem -out csr/${FQDN}-req.pem -days 5000 -sha256"
+echo "[req]
+default_bits = 4096
+prompt = no
+default_md = sha256
+distinguished_name = dn
 
-# podepsani certifikatu
-echo "openssl ca -config openssl.cnf -policy policy_anything -out certs/${FQDN}.pem -infiles csr/${FQDN}-req.pem"
+[dn]
+C=AU
+ST=example
+L=example.com
+O=example
+OU=example
+emailAddress=info@example.com
+CN = ${FQDN}" > ${FQDN}.csr.cnf
 
-# odstraneni hesla
-echo "openssl rsa -in private/${FQDN}-key.pem -out private/${FQDN}.key"
+echo "authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = ${FQDN}" > ${FQDN}.v3.ext
+
+openssl req -new -sha256 -nodes -out ${FQDN}.csr -newkey rsa:4096 -keyout ${FQDN}.key -config <( cat ${FQDN}.csr.cnf )
+
+openssl x509 -req -in ${FQDN}.csr -CA exampleCA.pem -CAkey exampleCA.key -CAcreateserial -out ${FQDN}.pem -days 5000 -sha256 -extfile ${FQDN}.v3.ext -passin file:password.txt
